@@ -36,15 +36,15 @@ router.get('/count/:make/:model', (req, res) => {
     const trims = (dataFile.counts[req.params.make] ?? {})[req.params.model] ?? {};
     return res.status(200).json(trims);
 });
-
+/*
 router.get('/average/:field', (req, res) => {
     let mean, median, mode;
     const trims = (dataFile.counts[req.params.make] ?? {})[req.params.model] ?? {};
     return res.status(200).json({
         mean,
         median,
-        mode
+        mode,
     });
 });
-
+*/
 export default router;

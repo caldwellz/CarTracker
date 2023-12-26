@@ -28,7 +28,7 @@ app.use((req, res, next) => {
         forwardedIp: req.headers['x-forwarded-for'],
         remoteAddress: req.socket?.remoteAddress,
         url: req.originalUrl,
-        headers: req.headers
+        headers: req.headers,
     };
     if (!ipIsAllowListed(ip) && (req.query.apiKey !== API_KEY || !API_KEY)) {
         console.error('Bad request', data);
@@ -52,13 +52,13 @@ app.use((req, res) => {
     res.status(404);
     return res.json({
         error: '🔍 Route Not Found',
-        requestedUrl: req.originalUrl
+        requestedUrl: req.originalUrl,
     });
 });
 
 app.on('error', (err) => {
     console.log(`Error: ${err}`);
-    process.exit(1);
+    process.exit(1); // eslint-disable-line unicorn/no-process-exit
 });
 
 app.listen(APP_PORT, APP_ADDRESS, () => {

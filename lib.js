@@ -11,9 +11,10 @@ dotenv.config({ path: '.env.local', override: true });
 dotenv.config({ path: `.env.${process.env.NODE_ENV}.local`, override: true });
 
 const { COMPRESSION_ENABLED, COMPRESSION_LEVEL = 3, NODE_ENV, PATH_PREFIX = '.' } = process.env;
-const path = `${PATH_PREFIX}/carData.json`;
 export const devMode = NODE_ENV !== 'production';
+const path = `${PATH_PREFIX}/carData.json`;
 const compressDb = (COMPRESSION_ENABLED ?? String(!devMode)) === 'true';
+const allowList = [/^127\./, /^10\./, /^192\.168\./];
 
 export const compress = promisify((buf, cb) =>
     zlib.brotliCompress(
@@ -23,11 +24,11 @@ export const compress = promisify((buf, cb) =>
             params: {
                 [zlib.constants.BROTLI_PARAM_MODE]: zlib.constants.BROTLI_MODE_TEXT,
                 [zlib.constants.BROTLI_PARAM_QUALITY]: COMPRESSION_LEVEL,
-                [zlib.constants.BROTLI_PARAM_SIZE_HINT]: buf?.length > 0 ? buf.length : 0
-            }
+                [zlib.constants.BROTLI_PARAM_SIZE_HINT]: buf?.length > 0 ? buf.length : 0,
+            },
         },
-        cb
-    )
+        cb,
+    ),
 );
 
 export const decompress = promisify((buf, cb) => zlib.brotliDecompress(buf, {}, cb));
@@ -44,7 +45,7 @@ export async function loadData() {
             // console.log('Data file compressed:', fileBuf.length, 'decompressed:', jsonText.length);
             loadedFile = JSON.parse(jsonText);
         } else {
-            loadedFile = JSON.parse(fs.readFileSync(path, { encoding: 'utf8' }));
+            loadedFile = JSON.parse(fs.readFileSync(path));
         }
         Object.assign(dataFile, loadedFile);
     } catch (err) {
@@ -77,8 +78,8 @@ export async function postJSON(endpoint, body) {
             'Accept-Language': 'en-US,en',
             'Content-Type': 'application/json',
             'User-Agent':
-                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-        }
+                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        },
     });
     const data = await response.json();
     // console.log('Headers:', response.headers);
@@ -86,22 +87,20 @@ export async function postJSON(endpoint, body) {
 }
 
 export function ipIsAllowListed(ip) {
-    const allowList = [/^127\./, /^10\./, /^192\.168\./];
-    const ipStr = String(ip);
     for (const regex of allowList) {
-        if (ipStr.match(regex)) return true;
+        if (regex.test(ip)) return true;
     }
     return false;
 }
 
 export function roundToDigits(num, digitsAfterDecimal = 1) {
     const [int, frac] = String(num).split('.');
-    if (!int || digitsAfterDecimal < 0) return NaN;
-    if (!(digitsAfterDecimal >= 1) || !frac) return parseInt(int);
+    if (!int || digitsAfterDecimal < 0) return Number.NaN;
+    if (!(digitsAfterDecimal >= 1) || !frac) return Number.parseInt(int);
     const roundedFrac = Math.round(
-        parseFloat(`${frac.slice(0, digitsAfterDecimal)}.${frac.slice(digitsAfterDecimal)}`)
+        Number.parseFloat(`${frac.slice(0, digitsAfterDecimal)}.${frac.slice(digitsAfterDecimal)}`),
     );
-    return parseFloat(`${int}.${roundedFrac}`);
+    return Number.parseFloat(`${int}.${roundedFrac}`);
 }
 
 export function getMsSince(start = 0, digitsAfterDecimal = 2) {

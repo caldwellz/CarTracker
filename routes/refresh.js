@@ -5,9 +5,14 @@ import { search } from '../sources/ksl.js';
 
 const router = express.Router();
 const limit = 96;
-const searchFilter = { limit, fuelType: 'Electric', minYear: 2017, maxYear: 2021 };
+const searchFilter = {
+    limit,
+    fuelType: 'Electric',
+    minYear: 2017,
+    maxYear: 2021,
+};
 const ignoreUpdates = ['updatedAt', 'vin'];
-const ignoreChanges = [...ignoreUpdates, 'active', 'contact', 'photos'];
+const ignoreChanges = new Set([...ignoreUpdates, 'active', 'contact', 'newOrUsed', 'photos', 'preowned']);
 
 function processUpdates(results) {
     let batchAdded = 0;
@@ -33,7 +38,7 @@ function processUpdates(results) {
                 extColor,
                 updates: [],
                 updatedAt,
-                ...otherData
+                ...otherData,
             };
             ++batchAdded;
             continue;
@@ -41,7 +46,7 @@ function processUpdates(results) {
 
         let didChange = false;
         for (const key of Object.keys(vehicle)) {
-            if (ignoreChanges.includes(key)) {
+            if (ignoreChanges.has(key)) {
                 if (!ignoreUpdates.includes(key)) vehicles[vin][key] = vehicle[key];
                 continue;
             }
@@ -50,7 +55,7 @@ function processUpdates(results) {
                     key,
                     old: oldListing[key],
                     new: vehicle[key],
-                    changedBetween: [oldListing.updatedAt, updatedAt]
+                    changedBetween: [oldListing.updatedAt, updatedAt],
                 });
                 vehicles[vin][key] = vehicle[key];
                 didChange = true;
@@ -103,7 +108,7 @@ router.get('/', async (req, res) => {
             added,
             changed,
             timeMs: getMsSince(startTime),
-            pageAvgMs: roundToDigits(getMsSince(startTime) / page)
+            pageAvgMs: roundToDigits(getMsSince(startTime) / page),
         });
     } catch (err) {
         console.error(req.originalUrl + ':', err);

@@ -3,7 +3,7 @@ import express from 'express';
 import { dataFile, devMode, getMsSince } from '../lib.js';
 
 const baseFields = [
-    'newOrUsed',
+    'preowned',
     'year',
     'make',
     'model',
@@ -17,7 +17,7 @@ const baseFields = [
     'titleType',
     'transType',
     'fuelType',
-    'listingUrl'
+    'listingUrl',
 ];
 
 const router = express.Router();
@@ -36,8 +36,8 @@ router.get('/:type?', (req, res) => {
         'Cache-Control': `max-age=${devMode ? 0 : 900}`,
         'Content-Type': 'text/csv',
         'Content-Disposition': `attachment;filename=CarTracker${
-            type ? '-' + type + (keys.length ? '-' + keys.join('-') : '') : ''
-        }.csv`
+            type ? '-' + type + (keys.length > 0 ? '-' + keys.join('-') : '') : ''
+        }.csv`,
     });
     const header = ['sellerType', 'vin', ...baseFields]
         .map((field) => {
@@ -50,7 +50,7 @@ router.get('/:type?', (req, res) => {
         .join(',');
     const rows = [header];
 
-    filterAndSortVins(req.query ?? {}, type).forEach((vin) => {
+    for (const vin of filterAndSortVins(req.query ?? {}, type)) {
         const vehicle = dataFile.vehicles[vin];
         const row = [vehicle.contact.sellerType, vin];
         for (const field of baseFields) {
@@ -67,7 +67,7 @@ router.get('/:type?', (req, res) => {
             row.push(val);
         }
         rows.push(row.join(','));
-    });
+    }
     const output = rows.join('\r\n');
     res.set('X-Response-Time', getMsSince(startTime));
     res.status(200).send(output);

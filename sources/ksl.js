@@ -4,7 +4,7 @@ import { postJSON } from '../lib.js';
 export async function getModels() {
     const { data } = await postJSON('https://cars.ksl.com/nextjs-api/proxy', {
         endpoint: '/classifieds/cars/category/getTrimsForMakeModel',
-        options: {}
+        options: {},
     });
     return data;
 }
@@ -23,7 +23,7 @@ function transformInput(rawParams) {
         minYear: yearFrom,
         models,
         page = 1,
-        trims
+        trims,
     } = rawParams;
     return {
         carfaxAvailable: freeHistoryReport ? 1 : undefined,
@@ -39,7 +39,7 @@ function transformInput(rawParams) {
         trim: trims?.join(';'),
         upholstery,
         yearFrom,
-        yearTo
+        yearTo,
     };
 }
 
@@ -66,7 +66,7 @@ function transformOutput(result, limit) {
             mobilePhone,
             model,
             msrp,
-            newUsed,
+            newUsed, // eslint-disable-line unicorn/no-keyword-prefix
             numberDoors,
             paint = [],
             photo = [],
@@ -79,7 +79,7 @@ function transformOutput(result, limit) {
             transmission,
             trim,
             vin,
-            zip = ''
+            zip = '',
         } = item ?? {};
         return {
             active: status === 'Active',
@@ -90,7 +90,7 @@ function transformOutput(result, limit) {
                 email,
                 sellerName: dealer?.dealerName || firstName,
                 sellerType,
-                text: dealer?.textNumber || mobilePhone
+                text: dealer?.textNumber || mobilePhone,
             },
             doors: numberDoors,
             extColor: paint.sort().join(','),
@@ -101,7 +101,7 @@ function transformOutput(result, limit) {
             make,
             model,
             msrp,
-            newOrUsed: newUsed,
+            preowned: newUsed === 'Used', // eslint-disable-line unicorn/no-keyword-prefix
             odometer: mileage,
             photos: photo.map((p) => (typeof p === 'string' ? JSON.parse(p) : p)),
             price,
@@ -109,7 +109,7 @@ function transformOutput(result, limit) {
             transType: transmission,
             trim,
             vin,
-            year: makeYear
+            year: makeYear,
         };
     });
 }
@@ -120,8 +120,9 @@ export async function search(rawParams = {}) {
     try {
         const params = transformInput(rawParams);
         body = Object.keys(params).reduce(
-            (acc, key) => (params[key] === undefined ? acc : [...acc, key, String(params[key])]),
-            []
+            (accumulator, key) =>
+                params[key] === undefined ? accumulator : [...accumulator, key, String(params[key])],
+            [],
         );
         result = await postJSON('https://cars.ksl.com/nextjs-api/proxy', {
             endpoint: '/classifieds/cars/search/searchByUrlParams',
@@ -129,10 +130,10 @@ export async function search(rawParams = {}) {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-DDM-EVENT-ACCEPT-LANGUAGE': 'en-US'
+                    'X-DDM-EVENT-ACCEPT-LANGUAGE': 'en-US',
                 },
-                body
-            }
+                body,
+            },
         });
         return transformOutput(result, params.perPage);
     } catch (err) {
