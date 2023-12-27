@@ -31,8 +31,21 @@ module.exports = {
             },
         },
         {
-            files: ['*.jsx'],
-            rules: { 'unicorn/filename-case': 'off' },
+            files: ['*.test.js'],
+            rules: {
+                'n/no-unpublished-import': [
+                    'error',
+                    {
+                        allowModules: ['chai', 'sinon', 'supertest'],
+                    },
+                ],
+            },
+        },
+        {
+            files: ['vite.config.js'],
+            rules: {
+                'n/no-unpublished-import': 'off',
+            },
         },
     ],
     rules: {
@@ -47,16 +60,19 @@ module.exports = {
         'n/no-process-exit': 'off', // Use unicorn's version of this rule instead
         'n/prefer-promises/dns': 'warn',
         'n/prefer-promises/fs': 'warn',
-        'n/no-unpublished-import': [
-            'error',
-            {
-                allowModules: ['chai', 'sinon', 'supertest'],
-            },
-        ],
         'no-constant-condition': ['error', { checkLoops: false }],
         'promise/prefer-await-to-then': 'warn',
         'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
         'unicorn/catch-error-name': 'off',
+        'unicorn/filename-case': [
+            'warn',
+            {
+                cases: {
+                    camelCase: true,
+                    pascalCase: true,
+                },
+            },
+        ],
         'unicorn/no-array-reduce': 'off',
         'unicorn/no-null': 'off',
         'unicorn/prevent-abbreviations': 'off',

@@ -8,6 +8,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint . --ext cjs,js,jsx,mjs --fix --report-unused-disable-directives",
     "dev": "nodemon index.js",
+    "dev-frontend": "vite serve",
+    "build-frontend": "vite build",
     "start": "node index.js"
   },
   "author": "",
@@ -16,9 +18,16 @@
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "helmet": "^7.1.0",
-    "node-fetch": "^3.3.2"
+    "node-fetch": "^3.3.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.21.1",
+    "web-vitals": "^3.5.0"
   },
   "devDependencies": {
+    "@types/react": "^18.2.45",
+    "@types/react-dom": "^18.2.18",
+    "@vitejs/plugin-react": "^4.2.1",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-n": "^16.5.0",
@@ -29,6 +38,7 @@
     "eslint-plugin-react-refresh": "^0.4.5",
     "eslint-plugin-unicorn": "^50.0.1",
     "nodemon": "^3.0.2",
-    "prettier": "^3.1.1"
+    "prettier": "^3.1.1",
+    "vite": "^5.0.10"
   }
 }
