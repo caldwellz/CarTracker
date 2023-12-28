@@ -1,4 +1,4 @@
-import App from './App.jsx';
+import Page from './components/Page.jsx';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
@@ -8,7 +8,7 @@ import { logWebVitals } from './reportWebVitals.js';
 ReactDOM.createRoot(document.querySelector('#root')).render(
     <React.StrictMode>
         <BrowserRouter basename="/cartracker">
-            <App />
+            <Page />
         </BrowserRouter>
     </React.StrictMode>,
 );

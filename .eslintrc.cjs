@@ -5,10 +5,13 @@ module.exports = {
     },
     parserOptions: {
         ecmaVersion: 'latest',
+        ecmaFeatures: {
+            jsx: true,
+        },
         sourceType: 'module',
         allowImportExportEverywhere: true,
     },
-    settings: { react: { version: '18.2' } },
+    settings: { react: { version: 'detect' } },
     plugins: ['react-refresh'],
     extends: [
         'eslint:recommended',
@@ -45,6 +48,12 @@ module.exports = {
             files: ['vite.config.js'],
             rules: {
                 'n/no-unpublished-import': 'off',
+            },
+        },
+        {
+            files: ['*.jsx'],
+            rules: {
+                'n/no-missing-import': 'off',
             },
         },
     ],
