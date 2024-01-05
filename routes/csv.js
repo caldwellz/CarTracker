@@ -59,7 +59,7 @@ router.get('/:type?', (req, res) => {
             if (typeof val === 'boolean') val = val ? 'Y' : 'N';
             else if (typeof val === 'string') val = val.replace(',', ';');
             if (type === 'changed' && keys.includes(field)) {
-                let { old, changedBetween = [] } = vehicle.updates.filter((upd) => upd.key === field).pop() ?? {};
+                let { old = '', changedBetween = [] } = vehicle.updates.filter((upd) => upd.key === field).pop() ?? {};
                 const changedAt = (changedBetween[1] ?? '').split('T')[0];
                 if (typeof old === 'boolean') old = old ? 'Y' : 'N';
                 else if (typeof old === 'string') old = old.replace(',', ';');
@@ -78,10 +78,13 @@ function filterAndSortVins(params, type) {
     const { keys = [], since, sort, sortReverse } = params;
     const sortKey = sort ?? sortReverse;
     const sortForward = sortKey === sort;
+    const sinceDate = since ? new Date(since).toISOString() : null;
     const result = Object.keys(dataFile.vehicles).filter((vin) => {
         const vehicle = dataFile.vehicles[vin];
-        if ((type === 'inactive') === vehicle.active) return false; // i.e. !(inactive type XOR active vehicle)
+        if (vehicle.updatedAt < sinceDate) return false;
         if (type === 'changed') {
+            if (!vehicle.active) return keys?.includes?.('active');
+            else if (keys?.includes?.('active')) return false;
             for (const update of vehicle.updates) {
                 const matchDate = new Date(since ?? vehicle.updatedAt).toISOString();
                 if (update.changedBetween[1] >= matchDate) {
@@ -91,10 +94,7 @@ function filterAndSortVins(params, type) {
             }
             return false;
         }
-        if (since) {
-            const matchDate = new Date(since).toISOString();
-            if (vehicle.updatedAt < matchDate) return false;
-        }
+        if ((type === 'inactive') === vehicle.active) return false; // i.e. !(inactive type XOR active vehicle)
         return true;
     });
     if (['vin', ...baseFields].includes(sortKey)) {
