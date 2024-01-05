@@ -27,6 +27,11 @@ app.get('/inactiveThisWeek', (req, res) => {
     res.redirect(`${BASE_PATH}/csv/inactive?since=${backdate}&sort=price&apiKey=${API_KEY}`);
 });
 
+app.get('/inactiveThisMonth', (req, res) => {
+    const backdate = new Date(Date.now() - 4 * 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    res.redirect(`${BASE_PATH}/csv/inactive?since=${backdate}&sort=price&apiKey=${API_KEY}`);
+});
+
 app.use((req, res, next) => {
     const ip = req.headers['x-forwarded-for'] || req.socket?.remoteAddress;
     const data = {

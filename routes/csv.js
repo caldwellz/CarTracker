@@ -17,6 +17,7 @@ const baseFields = [
     'titleType',
     'transType',
     'fuelType',
+    'updatedAt',
     'listingUrl',
 ];
 
