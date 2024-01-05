@@ -90,6 +90,10 @@ function filterAndSortVins(params, type) {
             }
             return false;
         }
+        if (since) {
+            const matchDate = new Date(since).toISOString();
+            if (vehicle.updatedAt < matchDate) return false;
+        }
         return true;
     });
     if (['vin', ...baseFields].includes(sortKey)) {

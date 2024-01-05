@@ -13,13 +13,18 @@ if (devMode) {
 }
 
 app.get('/changedPriceToday', (req, res) => {
-    const backdate = new Date().toISOString().split('T')[0];
+    const backdate = new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString().split('T')[0];
     res.redirect(`${BASE_PATH}/csv/changed?since=${backdate}&keys[]=price&sort=price&apiKey=${API_KEY}`);
 });
 
 app.get('/changedPriceThisWeek', (req, res) => {
     const backdate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
     res.redirect(`${BASE_PATH}/csv/changed?since=${backdate}&keys[]=price&sort=price&apiKey=${API_KEY}`);
+});
+
+app.get('/inactiveThisWeek', (req, res) => {
+    const backdate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    res.redirect(`${BASE_PATH}/csv/inactive?since=${backdate}&sort=price&apiKey=${API_KEY}`);
 });
 
 app.use((req, res, next) => {
