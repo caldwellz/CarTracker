@@ -54,6 +54,9 @@ app.use('/refresh', refresh);
 import stats from './routes/stats.js';
 app.use('/stats', stats);
 
+import details from './routes/details.js';
+app.use('/details', details);
+
 import csv from './routes/csv.js';
 app.use('/csv', csv);
 
